@@ -64,7 +64,6 @@ Metrics computed on log scale:
 - MAE  
 - RMSE  
 - R²  
-(Dollar-scale metrics available via Duan smearing if needed)
 
 ---
 
@@ -74,9 +73,90 @@ Metrics computed on log scale:
 Stabilizes variance and interprets errors as percentage-style deviations.
 
 **Tuning Strategy**  
-- 5-fold cross-validation  
+- 5-fold cross-validation 
 - Narrow alpha ranges to avoid convergence to OLS-like fits (minimal shrinkage)
+
+===============================================================================
+MODEL COMPARISON
+===============================================================================
+      Model             Best Alpha  MAE (log)  RMSE (log)  R² (log) Non-zero Features
+      Ridge                 1.0000       0.33        0.52      0.65             83/83
+      Lasso                 0.0100       0.34        0.53      0.64             62/83
+Elastic Net 0.0100 (l1_ratio=0.10)       0.33        0.52      0.65             81/83
+
+---
+Best model: **Elastic Net** (α=0.01, l1_ratio=0.10) — ties Ridge on accuracy with mild sparsity.
+
+Top drivers (log-scale coefficients — relative to baselines):
+
+age                -0.516
+fuel_gas           -0.212
+fuel_other         -0.118
+drive_fwd          -0.107
+transmission_other +0.091
+cyl_8              +0.091
+condition_fair     -0.082
+drive_unknown      -0.074
+cyl_3_4            -0.072
+fuel_hybrid        -0.069
+
 
 ---
 
-Feel free to explore the notebooks, inspect the feature engineering pipeline, or extend the modeling to tree-based methods or SHAP interpretation.
+## 🔍 Findings: What Moves Price
+
+- **Age dominates**  
+  Strong negative effect on log-price—newer cars command higher prices.
+
+- **Powertrain matters**  
+  8-cylinder configurations carry a premium versus small-cylinder baselines.  
+  Gas and some “other” fuel types tend to discount relative to the baseline.
+
+- **Drivetrain & condition**  
+  FWD and fair condition are associated with discounts.  
+  Transmission effects are present and consistent.
+
+- **Geography**  
+  `state` was excluded from the final model for simplicity.  
+  Can be reintroduced (or grouped into regions) if cross-validation shows performance lift.
+
+---
+
+## 💼 Business Recommendations
+
+- **Acquisition**  
+  Favor younger, lower-mileage vehicles.  
+  Selectively acquire trims with favorable powertrain signals (e.g., 8-cylinder premium segments).
+
+- **Pricing**  
+  Apply stronger markdowns for fair condition or FWD where discounts are observed.  
+  Maintain firmer pricing for configurations with positive effects.
+
+- **Listing Quality**  
+  Avoid installment/placeholder prices.  
+  Populate missing attributes—missingness correlates with lower realized prices.
+
+- **Inventory Mix**  
+  Maintain a balanced brand mix.  
+  Emphasize manufacturers historically associated with stronger pricing power.
+
+---
+
+## 🔮 Next Steps
+
+- **Model Families**  
+  Try tree-based boosting (e.g., `HistGradientBoostingRegressor`, LightGBM, CatBoost) to capture nonlinearity and interactions.  
+  Retain log target and compare dollar-scale MAE/RMSE (with Duan smearing).
+
+- **Feature Set**  
+  Reintroduce `state` (one-hot encoded).  
+  Test light interactions (e.g., `manufacturer × type`, `state × drive`) via cross-validated A/B experiments.
+
+- **Encodings**  
+  For very wide categoricals (e.g., `region`, `model`), use K-fold target encoding with smoothing.
+
+- **Transforms**  
+  Explore `log1p(odometer)` and spline transformations for `age` within the ≤15-year scope.
+
+- **Robustness**  
+  Validate model performance on a hold-out market (different geography or time window) before deployment.

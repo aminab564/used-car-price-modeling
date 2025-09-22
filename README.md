@@ -76,30 +76,8 @@ Stabilizes variance and interprets errors as percentage-style deviations.
 - 5-fold cross-validation 
 - Narrow alpha ranges to avoid convergence to OLS-like fits (minimal shrinkage)
 
-===============================================================================
-MODEL COMPARISON
-===============================================================================
-      Model             Best Alpha  MAE (log)  RMSE (log)  R² (log) Non-zero Features
-      Ridge                 1.0000       0.33        0.52      0.65             83/83
-      Lasso                 0.0100       0.34        0.53      0.64             62/83
-Elastic Net 0.0100 (l1_ratio=0.10)       0.33        0.52      0.65             81/83
-
 ---
 Best model: **Elastic Net** (α=0.01, l1_ratio=0.10) — ties Ridge on accuracy with mild sparsity.
-
-Top drivers (log-scale coefficients — relative to baselines):
-
-age                -0.516
-fuel_gas           -0.212
-fuel_other         -0.118
-drive_fwd          -0.107
-transmission_other +0.091
-cyl_8              +0.091
-condition_fair     -0.082
-drive_unknown      -0.074
-cyl_3_4            -0.072
-fuel_hybrid        -0.069
-
 
 ---
 

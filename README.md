@@ -25,7 +25,7 @@ Focused on mainstream retail inventory:
 Kaggle “Used Cars” subset (trimmed for speed and quality).
 
 **Key Columns Used**
-- `price`, `age' (created from `year`), `odometer`
+- `price`, `age` (created from `year` ), `odometer`
 - `manufacturer` (one-hot encoded, ~41 categories)
 - `condition`, `cylinders` (bucketed), `fuel`, `drive`, `transmission`, `size`, `type`
 - `paint_color` (bucketed), `VIN` (used for deduplication)

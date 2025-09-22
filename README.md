@@ -10,7 +10,7 @@ Predicting used-car prices for a mainstream dealership using linear regularizati
 Identify what consumers value in regular used cars (excluding vintage, exotic, and sports models) to support pricing and acquisition decisions.
 
 **Data Task**  
-Supervised regression on `log(price)` using structured features such as age, odometer, brand, drivetrain, condition, fuel type, cylinders, body type, and paint bucket.
+Supervised regression on `log(price)` using structured features such as age, odometer, brand, condition, fuel type, cylinders, body type, and paint bucket.
 
 **Scope**  
 Focused on mainstream retail inventory:

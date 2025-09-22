@@ -1,49 +1,82 @@
-Used Car Price Modeling (CRISP-DM)
+# 🚗 Used Car Price Modeling (CRISP-DM)
 
-Predicting used-car prices for a mainstream dealership using linear regularization (Ridge, Lasso, Elastic Net) with a log(price) target, documented through the CRISP-DM process.
+Predicting used-car prices for a mainstream dealership using linear regularization (Ridge, Lasso, Elastic Net) with a log(price) target, documented via the CRISP-DM process.
 
-Overview
+---
 
-Business goal: Identify what consumers value in a regular used car (not vintage/exotic/sport) and support pricing & acquisition decisions.
+## 📌 Overview
 
-Data task: Supervised regression on log(price) using structured features (age, odometer, brand, drivetrain, condition, fuel, cylinders, body type, paint bucket).
+**Business Goal**  
+Identify what consumers value in regular used cars (excluding vintage, exotic, and sports models) to support pricing and acquisition decisions.
 
-Scope: Focused on mainstream retail inventory: $3,000–$60,000 and ≤15 years old.
+**Data Task**  
+Supervised regression on `log(price)` using structured features such as age, odometer, brand, drivetrain, condition, fuel type, cylinders, body type, and paint bucket.
 
-Data
+**Scope**  
+Focused on mainstream retail inventory:
+- Price range: $3,000–$60,000  
+- Vehicle age: ≤15 years
 
-Source: Kaggle “Used Cars” subset (trimmed for performance and quality).
+---
 
-Columns used: price, year, odometer, manufacturer (one-hot ~41), condition, cylinders (bucketed), fuel, drive, transmission, size, type, paint_color (bucketed), VIN (for dedup checks), region/state (state ultimately not used).
+## 📊 Data
 
-CRISP-DM in brief
+**Source**  
+Kaggle “Used Cars” subset (trimmed for speed and quality).
 
-Business Understanding → dealership-oriented pricing, exclude installments & exotics.
+**Key Columns Used**
+- `price`, `year`, `odometer`
+- `manufacturer` (one-hot encoded, ~41 categories)
+- `condition`, `cylinders` (bucketed), `fuel`, `drive`, `transmission`, `size`, `type`
+- `paint_color` (bucketed), `VIN` (used for deduplication)
 
-Data Understanding → profiling, missingness, VIN duplicates (many VINs missing).
+**Excluded**
+- `state`: dropped for simplicity  
+- `model`: excluded due to granularity and messiness
 
-Data Preparation → filters, imputations, encodings (below).
+**Filters & Cleaning**
+- Retain listings priced $3k–$60k and aged ≤15 years
+- Drop “finance/installment” posts (not full prices)
+- Impute `odometer` by year median (train-only) + missing flag
+- Parse `cylinders` → impute by type median → bucket into: ≤4, 5, 6, 8, 10+, baseline = unknown
+- Fill categorical NAs/blanks as `"unknown"`
+- `paint_color` → collapsed into: neutrals / bright / other (baseline = other)
+- One-hot encode remaining categoricals; collapse rare manufacturers to `"other"`
 
-Modeling → Ridge, Lasso, Elastic Net (log target).
+---
 
-Evaluation → MAE/RMSE/R² on log scale (dollar metrics available via smearing if needed).
+## 📈 CRISP-DM Summary
 
-Preparation (key rules)
+**Business Understanding**  
+Focus on price drivers for mainstream retail; exclude placeholders and exotic listings.
 
-Filters: keep $3k–$60k; age ≤ 15; drop listings with “finance” in model (installments).
+**Data Understanding**  
+Profiling, missingness analysis, and VIN-based duplicate detection (common in public listings).
 
-Impute: odometer by year median (train-only) + flag; cylinders parsed → impute by type median → buckets (≤4, 5, 6, 8, 10+, baseline unknown).
+**Data Preparation**  
+Filtering, imputation, bucketing, and one-hot encoding of categorical variables.
 
-Categoricals: fill blanks as "unknown" for size, fuel, condition, title_status, transmission, drive, type, paint_color.
+**Modeling**  
+Linear regularization methods (Ridge, Lasso, Elastic Net) applied to standardized numeric features and binary dummies. Target variable is `log(price)`.
 
-Buckets: paint_color → neutrals | bright | other (baseline other).
+**Evaluation**  
+Metrics computed on log scale:
+- MAE  
+- RMSE  
+- R²  
+(Dollar-scale metrics available via Duan smearing if needed)
 
-One-hot: manufacturer (rare → “other”), state was NOT used in the final model; model dropped.
+---
 
-Modeling
+## 🔧 Modeling & Evaluation
 
-Target: log_price = log(price).
+**Why `log(price)`?**  
+Stabilizes variance and interprets errors as percentage-style deviations.
 
-Algorithms: Ridge, Lasso, Elastic Net with standardized numerics and one-hot cats.
+**Tuning Strategy**  
+- 5-fold cross-validation  
+- Narrow alpha ranges to avoid convergence to OLS-like fits (minimal shrinkage)
 
-Tuning note: Alphas were restricted because wide grids converged to OLS-like fits (minimal shrinkage).
+---
+
+Feel free to explore the notebooks, inspect the feature engineering pipeline, or extend the modeling to tree-based methods or SHAP interpretation.
